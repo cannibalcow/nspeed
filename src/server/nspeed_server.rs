@@ -1,6 +1,5 @@
 use std::{
     fmt::Display,
-    os::linux::net::SocketAddrExt,
     str::{self, FromStr},
 };
 use tokio::{
