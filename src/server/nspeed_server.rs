@@ -3,8 +3,8 @@ use std::{
     str::{self, FromStr},
 };
 use tokio::{
-    io::{self, AsyncReadExt, AsyncWriteExt},
-    net::TcpListener,
+    io::{self, AsyncReadExt, AsyncWriteExt, Error},
+    net::{TcpListener, TcpStream},
 };
 
 #[derive(Debug)]
@@ -103,24 +103,30 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
                 Ok(cmd) => match cmd {
                     Cmd::Upload(_) => {
                         info!("I should read now");
+                        read_data(&mut socket).await
                     }
                     Cmd::Download(size) => {
                         info!("Sending to client!");
-                        //let data = vec![0; 1024 * 1024 * v as usize];
-                        let chunk = vec![0; 1000 * 1024 * 1];
-                        let mut n = 0;
-                        while n < size {
-                            match socket.write(&chunk).await {
-                                Ok(_) => (),
-                                Err(e) => panic!("helvete {:?}", e),
-                            };
-                            n += 1;
-                        }
-                        socket.write(b"\n").await.unwrap();
+                        send_data(&mut socket, size).await
                     }
                 },
                 Err(e) => error!("{}", e),
             };
         });
     }
+}
+
+async fn read_data(socket: &mut TcpStream) {}
+
+async fn send_data(socket: &mut TcpStream, size: u32) {
+    let chunk = vec![0; 1000 * 1024 * 1];
+    let mut n = 0;
+    while n < size {
+        match socket.write(&chunk).await {
+            Ok(_) => (),
+            Err(e) => panic!("helvete {:?}", e),
+        };
+        n += 1;
+    }
+    socket.write(b"\n").await.unwrap();
 }

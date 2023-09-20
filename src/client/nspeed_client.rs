@@ -23,11 +23,12 @@ pub async fn client(host: &str, port: usize, data: usize) -> io::Result<()> {
         .unwrap();
     let (mut rd, mut wr) = io::split(socket);
 
-    let cmd_str = format!("Download {}\n", data);
+    let download_cmd_str = format!("Download {}\n", data);
+    let upload_cmd_str = format!("Upload {}\n", data);
 
     tokio::spawn(async move {
         info!("Sending: Hello");
-        wr.write_all(cmd_str.as_bytes()).await?;
+        wr.write_all(download_cmd_str.as_bytes()).await?;
         Ok::<_, io::Error>(())
     });
 
