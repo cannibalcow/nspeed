@@ -61,9 +61,10 @@ async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<()> 
     let upload_elapsed = upload_start.elapsed();
 
     info!(
-        "Uploaded {} mbytes in {}s ({}ms)",
+        "Uploaded {} mbytes in {}s ({} mb/s) ({}ms)",
         size_mb,
         upload_elapsed.as_secs(),
+        size_mb as f64 / upload_elapsed.as_secs() as f64,
         upload_elapsed.as_millis()
     );
 
@@ -107,9 +108,10 @@ async fn downlod_test(host: &str, port: usize, data: usize) -> io::Result<()> {
     let download_elapsed = download_start.elapsed();
 
     info!(
-        "Downloaded {} mbytes in {}s ({}ms)",
+        "Downloaded {} mbytes in {}s ({} mb/s) ({}ms)",
         data,
         download_elapsed.as_secs(),
+        data as f64 / download_elapsed.as_secs() as f64,
         download_elapsed.as_millis()
     );
 
