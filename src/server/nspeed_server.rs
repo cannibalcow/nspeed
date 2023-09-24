@@ -3,7 +3,7 @@ use std::{
     str::{self, FromStr},
 };
 use tokio::{
-    io::{self, AsyncReadExt, AsyncWriteExt, Error},
+    io::{self, AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
 };
 
@@ -83,7 +83,6 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
             let mut buf = vec![0; 1024];
 
             loop {
-                info!("Waiting for command");
                 let read_bytes = match socket.read(&mut buf).await {
                     Ok(0) => break,
                     Ok(n) => n,
@@ -95,30 +94,52 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
                 }
             }
 
-            info!("Got answer from client. Parsing...");
             let query = str::from_utf8(&buf).unwrap();
-            info!("Got '{}'", query.replace('\n', ""));
 
             match Cmd::from_str(query) {
                 Ok(cmd) => match cmd {
-                    Cmd::Upload(_) => {
-                        info!("I should read now");
-                        read_data(&mut socket).await
+                    Cmd::Upload(size) => {
+                        info!("Client Upload: {}", size);
+                        match read_data(&mut socket).await {
+                            Ok(_) => (),
+                            Err(e) => error!("{}", e),
+                        }
                     }
                     Cmd::Download(size) => {
-                        info!("Sending to client!");
-                        send_data(&mut socket, size).await
+                        info!("Client Download: {}", size);
+                        match send_data(&mut socket, size).await {
+                            Ok(_) => (),
+                            Err(e) => error!("{}", e),
+                        }
                     }
                 },
-                Err(e) => error!("{}", e),
+                Err(e) => error!("Client cmd error: {}: '{}'", e, query),
             };
         });
     }
 }
 
-async fn read_data(socket: &mut TcpStream) {}
+async fn read_data(socket: &mut TcpStream) -> io::Result<()> {
+    info!("Reading data:");
+    let mut buf = vec![0; 1024];
+    loop {
+        let read_bytes = match socket.read(&mut buf).await {
+            Ok(n) => n,
+            Err(k) => return Err(k),
+        };
 
-async fn send_data(socket: &mut TcpStream, size: u32) {
+        if read_bytes == 0 {
+            break;
+        }
+
+        if char::from(buf[read_bytes - 1]) == '\n' {
+            break;
+        }
+    }
+    Ok(())
+}
+
+async fn send_data(socket: &mut TcpStream, size: u32) -> io::Result<()> {
     let chunk = vec![0; 1000 * 1024 * 1];
     let mut n = 0;
     while n < size {
@@ -129,4 +150,5 @@ async fn send_data(socket: &mut TcpStream, size: u32) {
         n += 1;
     }
     socket.write(b"\n").await.unwrap();
+    Ok(())
 }
