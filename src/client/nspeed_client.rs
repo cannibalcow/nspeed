@@ -49,7 +49,7 @@ async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<()> 
 
     let upload_start = Instant::now();
 
-    let one_mb_chunk = vec![0; 1000 * 1024 * 1];
+    let one_mb_chunk = vec![0; 1000 * 1024];
 
     let mut n = 0;
 

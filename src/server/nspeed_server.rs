@@ -140,12 +140,12 @@ async fn read_data(socket: &mut TcpStream) -> io::Result<()> {
 }
 
 async fn send_data(socket: &mut TcpStream, size: u32) -> io::Result<()> {
-    let chunk = vec![0; 1000 * 1024 * 1];
+    let chunk = vec![0; 1000 * 1024];
     let mut n = 0;
     while n < size {
         match socket.write(&chunk).await {
             Ok(_) => (),
-            Err(e) => panic!("helvete {:?}", e),
+            Err(e) => error!("helvete {:?}", e),
         };
         n += 1;
     }
