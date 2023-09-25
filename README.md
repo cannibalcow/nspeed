@@ -1,20 +1,31 @@
-# Network speed testing
+# Nspeed Network Speed Testing
 
-## TODO
+Simple software to meassure network speed. Start server on a remote host and run client with 
+the data argument to send given amount of megabytes. 
 
-[x] Download testing
-[ ] Upload testing
-[ ] Better calculation of speed. With fancy units etc
 
-## Protocol
+## Usage Client
 
-Client -> Download 200
-Server <- Ok
-Client -> Read until '\0'
+```bash
+./speed client --help
 
-Client -> Upload 200
-Server <- Ok
-Client -> Write 200 end with '\0'
+Options:
+  -H, --host <HOST>  Adress for server [default: 0.0.0.0]
+  -p, --port <PORT>  Server port [default: 6666]
+  -d, --data <DATA>  Amount of data to be sent/received under test [default: 800]
+  -h, --help         Print help
+```
 
-client state - Command Upload Download
-server state - Command Upload Download
+![image](https://github.com/cannibalcow/nspeed/assets/6787042/1869e3c3-32cf-4e6c-8c18-489e13f48b97)
+
+## Usage server
+
+```bash
+./nspeed server --help
+
+Options:
+  -b, --bind <BIND>  Binding adress for server [default: 0.0.0.0]
+  -p, --port <PORT>  Server port [default: 6666]
+  -h, --help         Print help
+```
+![image](https://github.com/cannibalcow/nspeed/assets/6787042/f1b900ea-b196-415d-a8de-8943c890f7ba)
