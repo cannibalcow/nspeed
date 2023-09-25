@@ -1,4 +1,4 @@
-# Nspeed Network Speed Testing
+# Network Speed Testing CLI (nspeed)
 
 Simple software to meassure network speed. Start server on a remote host and run client with 
 the data argument to send given amount of megabytes. 
