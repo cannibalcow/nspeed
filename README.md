@@ -15,8 +15,7 @@ Options:
   -d, --data <DATA>  Amount of data to be sent/received under test [default: 800]
   -h, --help         Print help
 ```
-
-![image](https://github.com/cannibalcow/nspeed/assets/6787042/1869e3c3-32cf-4e6c-8c18-489e13f48b97)
+![image](https://github.com/cannibalcow/nspeed/assets/6787042/683b7428-fc72-4074-9d32-3e380ce5131a)
 
 ## Usage server
 
@@ -28,4 +27,4 @@ Options:
   -p, --port <PORT>  Server port [default: 6666]
   -h, --help         Print help
 ```
-![image](https://github.com/cannibalcow/nspeed/assets/6787042/f1b900ea-b196-415d-a8de-8943c890f7ba)
+![image](https://github.com/cannibalcow/nspeed/assets/6787042/72533aef-5db1-41d3-83ec-a2ea9aa845d2)
