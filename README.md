@@ -1,17 +1,17 @@
 # Network Speed Testing CLI (nspeed)
 
-Simple software to meassure network speed. Start server on a remote host and run client with 
-the data argument to send given amount of megabytes. 
+Simple software to meassure network speed. Start server on a remote host and run client with
+the data argument to send given amount of megabytes.
 
 ## Build
 
-```bash
+```
 cargo build --release
 ```
 
 ## Usage Client
 
-```bash
+```
 ./speed client --help
 
 Options:
@@ -20,11 +20,12 @@ Options:
   -d, --data <DATA>  Amount of data to be sent/received under test [default: 800]
   -h, --help         Print help
 ```
+
 ![image](https://github.com/cannibalcow/nspeed/assets/6787042/683b7428-fc72-4074-9d32-3e380ce5131a)
 
 ## Usage server
 
-```bash
+```
 ./nspeed server --help
 
 Options:
@@ -32,4 +33,11 @@ Options:
   -p, --port <PORT>  Server port [default: 6666]
   -h, --help         Print help
 ```
+
 ![image](https://github.com/cannibalcow/nspeed/assets/6787042/72533aef-5db1-41d3-83ec-a2ea9aa845d2)
+
+## Todos
+
+[ ] Better calculations for speed with fancy units and stuff
+[ ] Appendable csv/json outputfile
+[ ] Add retry functionallity
