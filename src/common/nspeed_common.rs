@@ -1,7 +1,7 @@
 use std::{fmt::Display, str::FromStr, time::Duration};
 
 use tokio::{
-    io::{self, AsyncReadExt, AsyncWriteExt},
+    io::{self, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::TcpStream,
 };
 
@@ -146,6 +146,13 @@ impl SpeedTestReport for SpeedTestResult {
 
         format!("{}\n{}", p1, p2)
     }
+}
+
+pub async fn read_command(stream: &mut TcpStream) -> io::Result<String> {
+    let mut reader = BufReader::new(stream);
+    let mut line = String::new();
+    reader.read_line(&mut line).await?;
+    Ok(line)
 }
 
 #[cfg(test)]

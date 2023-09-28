@@ -1,11 +1,11 @@
-use std::str::{from_utf8, FromStr};
+use std::str::FromStr;
 
 use tokio::{
-    io::{self, AsyncReadExt},
+    io::{self},
     net::TcpListener,
 };
 
-use crate::common::{read_data, send_data, Cmd};
+use crate::common::{read_command, read_data, send_data, Cmd};
 
 pub async fn server(bind: &str, port: usize) -> io::Result<()> {
     println!(
@@ -29,23 +29,15 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
         tokio::spawn(async move {
             info!("Connection esatblished: {}", socket.peer_addr().unwrap());
 
-            let mut buf = vec![0; 1024];
-
-            loop {
-                let read_bytes = match socket.read(&mut buf).await {
-                    Ok(0) => break,
-                    Ok(n) => n,
-                    Err(_) => return,
-                };
-
-                if char::from(buf[read_bytes - 1]) == '\n' {
-                    break;
+            let command_str = match read_command(&mut socket).await {
+                Ok(v) => v,
+                Err(e) => {
+                    error!("Error reading line: {}", e);
+                    return;
                 }
-            }
+            };
 
-            let query = from_utf8(&buf).unwrap();
-
-            match Cmd::from_str(query) {
+            match Cmd::from_str(&command_str) {
                 Ok(cmd) => match cmd {
                     Cmd::Upload(size) => {
                         info!("Client Upload: {}", size);
@@ -62,8 +54,9 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
                         }
                     }
                 },
-                Err(e) => error!("Client cmd error: {}: '{}'", e, query),
+                Err(e) => error!("Client command error: {}: '{}'", e, command_str),
             };
         });
+        info!("Closed connection");
     }
 }

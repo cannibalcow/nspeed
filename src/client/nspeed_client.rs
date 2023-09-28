@@ -19,8 +19,8 @@ pub async fn client(host: &str, port: usize, size_mb: usize) -> io::Result<()> {
 "
     );
 
-    let down_result = downlod_test(host, port, size_mb).await?;
     let up_result = upload_test(host, port, size_mb).await?;
+    let down_result = downlod_test(host, port, size_mb).await?;
 
     println!("{}", down_result.to_string());
     println!("{}", up_result.to_string());
