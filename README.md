@@ -3,6 +3,11 @@
 Simple software to meassure network speed. Start server on a remote host and run client with 
 the data argument to send given amount of megabytes. 
 
+## Build
+
+```bash
+cargo build --release
+```
 
 ## Usage Client
 
