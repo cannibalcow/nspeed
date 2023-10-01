@@ -43,6 +43,6 @@ Options:
 
 ```
   [ ] Better calculations for speed with fancy units and stuff
-  [ ] Appendable csv/json outputfile
+  [x] Appendable csv/json outputfile
   [x] Add loop functionallity
 ```

@@ -1,10 +1,16 @@
-use clap::{arg, command, Parser, Subcommand};
+use clap::{arg, command, Parser, Subcommand, ValueEnum};
 
 #[derive(Parser, Debug)]
 #[command(author,version,about, long_about = None)]
 pub struct NspeedArgs {
     #[command(subcommand)]
     pub speed_test_command: SpeedTestCommand,
+}
+
+#[derive(Debug, ValueEnum, Clone)]
+pub enum OutputFormat {
+    Console,
+    Json,
 }
 
 #[derive(Subcommand, Debug)]
@@ -34,5 +40,12 @@ pub enum SpeedTestCommand {
 
         #[arg(short = 'l', long, default_value_t = 1, help = "Number of tests")]
         loops: usize,
+
+        #[arg(short = 'f', long, default_value_t = OutputFormat::Console, help = "Output format" )]
+        #[clap(value_enum)]
+        format: OutputFormat,
+
+        #[arg(short = 'o', long, help = "Output filename")]
+        output: Option<String>,
     },
 }

@@ -1,14 +1,25 @@
-use crate::common::nspeed_common::{send_command, SpeedTestReport};
-use crate::common::SpeedTestResult;
-use crate::common::{send_data, SpeedTest};
-use std::time::Instant;
-use tokio::io::{self};
+use std::time::{Duration, Instant};
+
+use crate::cli::args::OutputFormat;
+use crate::common::nspeed_common::send_command;
+use crate::common::{calculate_mbits, send_data, NetworkSpeedTestResult, SpeedTest, TestResult};
+use chrono::Utc;
+use tokio::fs::File;
+use tokio::io::{self, AsyncWriteExt};
 use tokio::net::TcpStream;
 
 extern crate log;
 extern crate pretty_env_logger;
 
-pub async fn client(host: &str, port: usize, size_mb: usize, loops: usize) -> io::Result<()> {
+// Todo: take cmd instead
+pub async fn client(
+    host: &str,
+    port: usize,
+    size_mb: usize,
+    loops: usize,
+    format: OutputFormat,
+    output: Option<String>,
+) -> io::Result<()> {
     println!(
         r"
  ▐ ▄ .▄▄ ·  ▄▄▄·▄▄▄ .▄▄▄ .·▄▄▄▄       ▄▄· ▄▄▌  ▪  ▄▄▄ . ▐ ▄ ▄▄▄▄▄
@@ -19,19 +30,60 @@ pub async fn client(host: &str, port: usize, size_mb: usize, loops: usize) -> io
 "
     );
 
+    let mut nrs = NetworkSpeedTestResult {
+        iterations: loops,
+        data_size: size_mb,
+        result: vec![],
+        date: Utc::now(),
+    };
+
     for test_it in 0..loops {
         info!("Test iteration: {}/{}", test_it + 1, loops);
-        let up_result = upload_test(host, port, size_mb).await?;
-        let down_result = downlod_test(host, port, size_mb).await?;
 
-        println!("{}", down_result.to_string());
-        println!("{}", up_result.to_string());
+        let mut result = TestResult::new(0.0, 0.0);
+
+        let up_duration = upload_test(host, port, size_mb).await?;
+        result.up_speed = calculate_mbits(up_duration, size_mb);
+
+        let down_duration = downlod_test(host, port, size_mb).await?;
+        result.down_speed = calculate_mbits(down_duration, size_mb);
+
+        info!("{}", result.to_string());
+
+        nrs.result.push(result);
+    }
+
+    let output_str = match format {
+        OutputFormat::Console => {
+            let console_str = nrs.to_string();
+            if loops > 1 {
+                info!("{}", console_str);
+            }
+            console_str
+        }
+        OutputFormat::Json => {
+            let json_str =
+                serde_json::to_string_pretty(&nrs).unwrap_or(String::from("could not create json"));
+            info!("{}", json_str);
+            json_str
+        }
+    };
+
+    if let Some(path) = output {
+        write_to_file(path, output_str).await?
     }
 
     Ok(())
 }
 
-async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<SpeedTestResult> {
+async fn write_to_file(path: String, output: String) -> io::Result<()> {
+    let mut file = File::create(path).await?;
+    file.write_all(output.as_bytes()).await?;
+    file.flush().await?;
+    Ok(())
+}
+
+async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<Duration> {
     info!("Starting upload speed test. Sending {} mb", size_mb);
     let mut socket = TcpStream::connect(format!("{}:{}", host, port))
         .await
@@ -47,13 +99,10 @@ async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<Spee
 
     send_data(&mut socket, size_mb).await?;
 
-    Ok(SpeedTestResult {
-        duration: upload_timer.elapsed(),
-        speed_test: cmd,
-    })
+    Ok(upload_timer.elapsed())
 }
 
-async fn downlod_test(host: &str, port: usize, data: usize) -> io::Result<SpeedTestResult> {
+async fn downlod_test(host: &str, port: usize, data: usize) -> io::Result<Duration> {
     info!("Starting download speed test. Reading {} mb", data);
 
     let mut socket = TcpStream::connect(format!("{}:{}", host, port))
@@ -66,8 +115,5 @@ async fn downlod_test(host: &str, port: usize, data: usize) -> io::Result<SpeedT
 
     crate::common::read_data(&mut socket).await?;
 
-    Ok(SpeedTestResult {
-        duration: download_start.elapsed(),
-        speed_test: cmd,
-    })
+    Ok(download_start.elapsed())
 }

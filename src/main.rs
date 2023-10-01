@@ -18,6 +18,7 @@ extern crate log;
 async fn main() -> io::Result<()> {
     env::set_var("RUST_LOG", "trace");
     pretty_env_logger::init();
+
     let args = NspeedArgs::parse();
 
     match args.speed_test_command {
@@ -29,8 +30,10 @@ async fn main() -> io::Result<()> {
             port,
             data,
             loops,
+            format,
+            output,
         } => {
-            nspeed_client::client(&host, port, data, loops).await?;
+            nspeed_client::client(&host, port, data, loops, format, output).await?;
         }
     }
 
