@@ -8,7 +8,7 @@ use tokio::net::TcpStream;
 extern crate log;
 extern crate pretty_env_logger;
 
-pub async fn client(host: &str, port: usize, size_mb: usize) -> io::Result<()> {
+pub async fn client(host: &str, port: usize, size_mb: usize, loops: usize) -> io::Result<()> {
     println!(
         r"
  ▐ ▄ .▄▄ ·  ▄▄▄·▄▄▄ .▄▄▄ .·▄▄▄▄       ▄▄· ▄▄▌  ▪  ▄▄▄ . ▐ ▄ ▄▄▄▄▄
@@ -19,11 +19,14 @@ pub async fn client(host: &str, port: usize, size_mb: usize) -> io::Result<()> {
 "
     );
 
-    let up_result = upload_test(host, port, size_mb).await?;
-    let down_result = downlod_test(host, port, size_mb).await?;
+    for test_it in 0..loops {
+        info!("Test iteration: {}/{}", test_it + 1, loops);
+        let up_result = upload_test(host, port, size_mb).await?;
+        let down_result = downlod_test(host, port, size_mb).await?;
 
-    println!("{}", down_result.to_string());
-    println!("{}", up_result.to_string());
+        println!("{}", down_result.to_string());
+        println!("{}", up_result.to_string());
+    }
 
     Ok(())
 }
@@ -51,7 +54,7 @@ async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<Spee
 }
 
 async fn downlod_test(host: &str, port: usize, data: usize) -> io::Result<SpeedTestResult> {
-    info!("Down speed test. Reading {} mb ...", data);
+    info!("Starting download speed test. Reading {} mb", data);
 
     let mut socket = TcpStream::connect(format!("{}:{}", host, port))
         .await

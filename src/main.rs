@@ -24,8 +24,13 @@ async fn main() -> io::Result<()> {
         SpeedTestCommand::Server { bind, port } => {
             nspeed_server::server(&bind, port).await?;
         }
-        SpeedTestCommand::Client { host, port, data } => {
-            nspeed_client::client(&host, port, data).await?;
+        SpeedTestCommand::Client {
+            host,
+            port,
+            data,
+            loops,
+        } => {
+            nspeed_client::client(&host, port, data, loops).await?;
         }
     }
 

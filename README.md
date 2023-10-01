@@ -14,11 +14,14 @@ cargo build --release
 ```
 ./speed client --help
 
+Usage: nspeed client [OPTIONS]
+
 Options:
-  -H, --host <HOST>  Adress for server [default: 0.0.0.0]
-  -p, --port <PORT>  Server port [default: 6666]
-  -d, --data <DATA>  Amount of data to be sent/received under test [default: 800]
-  -h, --help         Print help
+  -H, --host <HOST>    Adress for server [default: 0.0.0.0]
+  -p, --port <PORT>    Server port [default: 6666]
+  -d, --data <DATA>    Amount of data to be sent/received under test [default: 800]
+  -l, --loops <LOOPS>  Number of tests [default: 1]
+  -h, --help           Print help
 ```
 
 ![image](https://github.com/cannibalcow/nspeed/assets/6787042/683b7428-fc72-4074-9d32-3e380ce5131a)
@@ -37,8 +40,9 @@ Options:
 ![image](https://github.com/cannibalcow/nspeed/assets/6787042/72533aef-5db1-41d3-83ec-a2ea9aa845d2)
 
 ## Todos
+
 ```
   [ ] Better calculations for speed with fancy units and stuff
   [ ] Appendable csv/json outputfile
-  [ ] Add retry functionallity
+  [x] Add loop functionallity
 ```

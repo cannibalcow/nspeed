@@ -31,5 +31,8 @@ pub enum SpeedTestCommand {
             help = "Amount of data to be sent/received under test"
         )]
         data: usize,
+
+        #[arg(short = 'l', long, default_value_t = 1, help = "Number of tests")]
+        loops: usize,
     },
 }
