@@ -16,7 +16,7 @@ pub async fn client(
     host: &str,
     port: usize,
     size_mb: usize,
-    loops: usize,
+    iterations: usize,
     format: OutputFormat,
     output: Option<String>,
 ) -> io::Result<()> {
@@ -31,15 +31,15 @@ pub async fn client(
     );
 
     let mut nrs = NetworkSpeedTestResult {
-        iterations: loops,
+        iterations,
         data_size: size_mb,
         result: vec![],
         date: Utc::now(),
         average_duration_ms: 0.0,
     };
 
-    for test_it in 0..loops {
-        info!("Test iteration: {}/{}", test_it + 1, loops);
+    for test_it in 0..iterations {
+        info!("Test iteration: {}/{}", test_it + 1, iterations);
 
         let mut result = TestResult::new(Duration::new(0, 0), 0.0, 0.0);
 
@@ -63,7 +63,7 @@ pub async fn client(
     let output_str = match format {
         OutputFormat::Console => {
             let console_str = nrs.to_string();
-            if loops > 1 {
+            if iterations > 1 {
                 info!("{}", console_str);
             }
             console_str
@@ -92,9 +92,7 @@ async fn write_to_file(path: String, output: String) -> io::Result<()> {
 
 async fn upload_test(host: &str, port: usize, size_mb: usize) -> io::Result<Duration> {
     info!("Starting upload speed test. Sending {} mb", size_mb);
-    let mut socket = TcpStream::connect(format!("{}:{}", host, port))
-        .await
-        .unwrap();
+    let mut socket = TcpStream::connect(format!("{}:{}", host, port)).await?;
 
     let cmd = SpeedTest::Upload(size_mb);
 

@@ -19,9 +19,7 @@ pub async fn server(bind: &str, port: usize) -> io::Result<()> {
 
     info!("Booting up server");
 
-    let listener = TcpListener::bind(format!("{}:{}", bind, port))
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(format!("{}:{}", bind, port)).await?;
 
     loop {
         let (mut socket, _) = listener.accept().await?;

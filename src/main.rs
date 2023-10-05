@@ -22,9 +22,10 @@ async fn main() -> io::Result<()> {
     let args = NspeedArgs::parse();
 
     match args.speed_test_command {
-        SpeedTestCommand::Server { bind, port } => {
-            nspeed_server::server(&bind, port).await?;
-        }
+        SpeedTestCommand::Server { bind, port } => match nspeed_server::server(&bind, port).await {
+            Ok(_) => (),
+            Err(e) => error!("{}", e),
+        },
         SpeedTestCommand::Client {
             host,
             port,
@@ -33,7 +34,10 @@ async fn main() -> io::Result<()> {
             format,
             output,
         } => {
-            nspeed_client::client(&host, port, data, iterations, format, output).await?;
+            match nspeed_client::client(&host, port, data, iterations, format, output).await {
+                Ok(_) => (),
+                Err(e) => error!("{}", e),
+            };
         }
     }
 
