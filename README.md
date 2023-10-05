@@ -20,7 +20,7 @@ Options:
   -H, --host <HOST>    Adress for server [default: 0.0.0.0]
   -p, --port <PORT>    Server port [default: 6666]
   -d, --data <DATA>    Amount of data to be sent/received under test [default: 800]
-  -l, --loops <LOOPS>  Number of tests [default: 1]
+  -i, --iterations <ITERATIONS>  Number of tests [default: 1]
   -h, --help           Print help
 ```
 

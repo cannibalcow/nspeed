@@ -38,8 +38,8 @@ pub enum SpeedTestCommand {
         )]
         data: usize,
 
-        #[arg(short = 'l', long, default_value_t = 1, help = "Number of tests")]
-        loops: usize,
+        #[arg(short = 'i', long, default_value_t = 1, help = "Number of tests")]
+        iterations: usize,
 
         #[arg(short = 'f', long, default_value_t = OutputFormat::Console, help = "Output format" )]
         #[clap(value_enum)]

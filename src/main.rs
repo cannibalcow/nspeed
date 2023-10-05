@@ -29,11 +29,11 @@ async fn main() -> io::Result<()> {
             host,
             port,
             data,
-            loops,
+            iterations,
             format,
             output,
         } => {
-            nspeed_client::client(&host, port, data, loops, format, output).await?;
+            nspeed_client::client(&host, port, data, iterations, format, output).await?;
         }
     }
 
