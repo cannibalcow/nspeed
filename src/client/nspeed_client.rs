@@ -35,12 +35,15 @@ pub async fn client(
         data_size: size_mb,
         result: vec![],
         date: Utc::now(),
+        average_duration_ms: 0.0,
     };
 
     for test_it in 0..loops {
         info!("Test iteration: {}/{}", test_it + 1, loops);
 
-        let mut result = TestResult::new(0.0, 0.0);
+        let mut result = TestResult::new(Duration::new(0, 0), 0.0, 0.0);
+
+        let timer = Instant::now();
 
         let up_duration = upload_test(host, port, size_mb).await?;
         result.up_speed = calculate_mbits(up_duration, size_mb);
@@ -48,10 +51,14 @@ pub async fn client(
         let down_duration = downlod_test(host, port, size_mb).await?;
         result.down_speed = calculate_mbits(down_duration, size_mb);
 
+        result.duration = timer.elapsed();
+
         info!("{}", result.to_string());
 
         nrs.result.push(result);
     }
+
+    nrs.calc_average();
 
     let output_str = match format {
         OutputFormat::Console => {

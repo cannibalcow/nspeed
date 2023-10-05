@@ -175,15 +175,17 @@ pub async fn read_command(stream: &mut TcpStream) -> io::Result<String> {
 #[derive(Serialize, Debug)]
 pub struct TestResult {
     pub ts: DateTime<Utc>,
+    pub duration: Duration,
     pub down_speed: f64,
     pub up_speed: f64,
 }
 
 impl TestResult {
-    pub fn new(down_speed: f64, up_speed: f64) -> Self {
+    pub fn new(duration: Duration, down_speed: f64, up_speed: f64) -> Self {
         let ts = Utc::now();
         Self {
             ts,
+            duration,
             down_speed,
             up_speed,
         }
@@ -197,13 +199,30 @@ pub struct NetworkSpeedTestResult {
     pub data_size: usize,
     pub result: Vec<TestResult>,
     pub date: DateTime<Utc>,
+    pub average_duration_ms: f64,
+}
+
+impl NetworkSpeedTestResult {
+    pub fn calc_average(&mut self) {
+        let average = self
+            .result
+            .iter()
+            .map(|test| test.duration.as_millis())
+            .fold(0.0, |sum, n| sum + n as f64)
+            / self.result.len() as f64;
+
+        self.average_duration_ms = average;
+    }
 }
 
 impl ToString for TestResult {
     fn to_string(&self) -> String {
         format!(
-            "Date: {} Upload: {} mbps Download: {} mbps",
-            self.ts, self.up_speed, self.down_speed
+            "Date: {} Upload: {} mbps Download: {} mbps Duration ms: {}",
+            self.ts,
+            self.up_speed,
+            self.down_speed,
+            self.duration.as_millis()
         )
     }
 }
@@ -211,8 +230,8 @@ impl ToString for TestResult {
 impl ToString for NetworkSpeedTestResult {
     fn to_string(&self) -> String {
         let meta = format!(
-            "Test iterations: {}\nData size: {}",
-            self.iterations, self.data_size
+            "Test iterations: {}\nData size: {} Average duration: {}",
+            self.iterations, self.data_size, self.average_duration_ms
         );
 
         let rows: String = self
