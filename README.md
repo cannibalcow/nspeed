@@ -38,11 +38,3 @@ Options:
 ```
 
 ![image](https://github.com/cannibalcow/nspeed/assets/6787042/72533aef-5db1-41d3-83ec-a2ea9aa845d2)
-
-## Todos
-
-```
-  [ ] Better calculations for speed with fancy units and stuff
-  [x] Appendable csv/json outputfile
-  [x] Add loop functionallity
-```

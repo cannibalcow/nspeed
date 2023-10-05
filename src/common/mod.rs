@@ -7,6 +7,4 @@ pub use self::nspeed_common::Cmd;
 pub use self::nspeed_common::CmdParserError;
 pub use self::nspeed_common::NetworkSpeedTestResult;
 pub use self::nspeed_common::SpeedTest;
-pub use self::nspeed_common::SpeedTestReport;
-pub use self::nspeed_common::SpeedTestResultOld;
 pub use self::nspeed_common::TestResult;

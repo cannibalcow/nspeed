@@ -116,61 +116,12 @@ pub async fn send_command(socket: &mut TcpStream, cmd: &SpeedTest) -> Result<(),
     socket.write_all(cmd.to_str().as_bytes()).await
 }
 
-pub trait SpeedTestReport {
-    fn to_string(&self) -> String;
-}
-// Todo: Yeah.. rewrite this to more generic result
-pub struct SpeedTestResultOld {
-    pub duration: Duration,
-    pub speed_test: SpeedTest,
-}
-
-impl SpeedTestReport for SpeedTestResultOld {
-    fn to_string(&self) -> String {
-        let (name, size) = match self.speed_test {
-            SpeedTest::Download(st) => ("Download", st),
-            SpeedTest::Upload(st) => ("Upload", st),
-        };
-
-        let p1 = format!(
-            "{}ed {} Mb in {} s ({} Mb/s) ({} ms)",
-            name,
-            size,
-            self.duration.as_secs(),
-            size as f64 / self.duration.as_secs() as f64,
-            self.duration.as_millis()
-        );
-
-        let p2 = format!(
-            "{} Speed: {} mbit",
-            name,
-            calculate_mbits(self.duration, size)
-        );
-
-        format!("{}\n{}", p1, p2)
-    }
-}
-
 pub async fn read_command(stream: &mut TcpStream) -> io::Result<String> {
     let mut reader = BufReader::new(stream);
     let mut line = String::new();
     reader.read_line(&mut line).await?;
     Ok(line)
 }
-
-/**
-*{
-  "iterations": num, // number of iterations.. Don't know if I should use this.. cound result instead
-  "data_size": num, // number mb data used in test
-  "result" [
-    {
-      ts: datetime,
-      down_speed: num, // always give in bytes/s ?
-      up_speed: num,
-    }
-  ]
-}
-*/
 
 #[derive(Serialize, Debug)]
 pub struct TestResult {
@@ -192,7 +143,6 @@ impl TestResult {
     }
 }
 
-// Todo name it to something smurt...
 #[derive(Serialize, Debug)]
 pub struct NetworkSpeedTestResult {
     pub iterations: usize,
@@ -247,38 +197,13 @@ impl ToString for NetworkSpeedTestResult {
 
 #[cfg(test)]
 mod test {
+    use crate::common::calculate_mbits;
     use std::time::Duration;
-
-    use chrono::Utc;
-
-    use crate::common::{calculate_mbits, TestResult};
-
-    use super::NetworkSpeedTestResult;
 
     #[test]
     fn calc() {
         assert_eq!(calculate_mbits(Duration::new(8, 0), 100), 100.0);
         assert_eq!(calculate_mbits(Duration::new(260, 0), 3251), 100.0);
         assert_eq!(calculate_mbits(Duration::new(1, 0), 1024), 8192.0);
-    }
-
-    #[test]
-    fn result_json() {
-        let r1 = TestResult {
-            up_speed: 123.0,
-            down_speed: 321.0,
-            ts: Utc::now(),
-        };
-        let res = vec![r1];
-
-        let nsr = NetworkSpeedTestResult {
-            iterations: 2,
-            data_size: 102,
-            result: res,
-            date: Utc::now(),
-        };
-        let json = serde_json::to_string_pretty(&nsr).unwrap();
-
-        println!("{}", json);
     }
 }
