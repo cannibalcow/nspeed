@@ -43,6 +43,8 @@ Options:
 
 ```
   [ ] Better calculations for speed with fancy units and stuff
+  [ ] More detailed testreport.
+  [ ] Latency testing
   [x] Appendable csv/json outputfile
   [x] Add loop functionallity
 ```
